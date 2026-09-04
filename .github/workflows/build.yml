@@ -1,0 +1,43 @@
+name: Build TranscribeApp
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch: {}
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact_name: TranscribeApp-windows
+          - os: macos-latest
+            artifact_name: TranscribeApp-macos
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build
+        run: python build.py
+
+      - name: Zip build (Windows)
+        if: runner.os == 'Windows'
+        run: Compress-Archive -Path dist/TranscribeApp -DestinationPath TranscribeApp-windows.zip
+        shell: pwsh
+
+      - name: Zip build (macOS)
+        if: runner.os == 'macOS'
+        run: cd dist && zip -r ../TranscribeApp-macos.zip TranscribeApp.app
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.artifact_name }}
+          path: TranscribeApp-*.zip
