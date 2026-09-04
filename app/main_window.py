@@ -247,6 +247,14 @@ class QueueTab(QWidget):
         self.worker.job_cancelled.connect(self._on_job_cancelled)
         self.worker.queue_finished.connect(self._on_queue_finished)
         self.worker.queue_finished.connect(self.thread.quit)
+        # Only drop our references / delete the QObjects once the QThread has
+        # actually finished running (thread.finished), not as soon as
+        # queue_finished fires — queue_finished is emitted from *inside* the
+        # worker thread, so tearing down the thread/worker objects right then
+        # races the thread's own shutdown and can crash the whole process.
+        self.thread.finished.connect(self._on_thread_finished)
+        self.thread.finished.connect(self.worker.deleteLater)
+        self.thread.finished.connect(self.thread.deleteLater)
         self.thread.start()
 
     def stop_queue(self):
@@ -309,9 +317,10 @@ class QueueTab(QWidget):
             self.table.item(row, COL_STATUS).setText(STATUS_CANCELLED)
 
     def _on_queue_finished(self):
-        self.add_btn.setEnabled(True)
-        self.start_btn.setEnabled(True)
-        self.stop_btn.setEnabled(False)
+        # Runs while the worker thread is still alive (queue_finished is
+        # emitted from inside it) — safe to touch UI/state, but must NOT
+        # drop our reference to self.worker/self.thread here. That happens
+        # in _on_thread_finished, once the thread has actually stopped.
         self._log("התור הסתיים.")
         # Mark any still-waiting rows as cancelled if a stop was requested mid-run.
         if self.worker and self.worker.stop_requested:
@@ -319,6 +328,11 @@ class QueueTab(QWidget):
                 item = self.table.item(j["row"], COL_STATUS)
                 if item and item.text() == STATUS_WAITING:
                     item.setText(STATUS_CANCELLED)
+
+    def _on_thread_finished(self):
+        self.add_btn.setEnabled(True)
+        self.start_btn.setEnabled(True)
+        self.stop_btn.setEnabled(False)
         self.worker = None
         self.thread = None
 
