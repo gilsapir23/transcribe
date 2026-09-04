@@ -314,7 +314,7 @@ class QueueTab(QWidget):
         self.stop_btn.setEnabled(False)
         self._log("התור הסתיים.")
         # Mark any still-waiting rows as cancelled if a stop was requested mid-run.
-        if self.worker and self.worker._stop_requested:
+        if self.worker and self.worker.stop_requested:
             for jid, j in self.jobs.items():
                 item = self.table.item(j["row"], COL_STATUS)
                 if item and item.text() == STATUS_WAITING:

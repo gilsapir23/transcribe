@@ -29,6 +29,10 @@ class QueueWorker(QObject):
     def request_stop(self):
         self._stop_requested = True
 
+    @property
+    def stop_requested(self) -> bool:
+        return self._stop_requested
+
     @Slot()
     def run(self):
         self._stop_requested = False
