@@ -6,6 +6,8 @@
 דרך מסך הגדרות (מפתח ה-API נשמר ב-Windows Credential Manager / macOS
 Keychain, לא בקובץ טקסט גלוי).
 
+![צילום מסך של TranscribeApp](docs/screenshot.png)
+
 ## הורדה
 
 הכי פשוט: עברו לעמוד ה-[**Releases**](../../releases/latest) של הריפו,

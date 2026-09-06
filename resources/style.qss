@@ -81,3 +81,14 @@ QTextEdit#log {
     font-family: Consolas, monospace;
     font-size: 12px;
 }
+QLabel#brandBanner {
+    background: #eef1fb;
+    color: #5a6072;
+    border-top: 1px solid #dde1ea;
+    font-size: 12px;
+}
+QLabel#brandBanner a {
+    color: #2653e8;
+    font-weight: 600;
+    text-decoration: none;
+}

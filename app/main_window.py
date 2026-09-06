@@ -288,7 +288,7 @@ class QueueTab(QWidget):
             bar.setFormat("הושלם")
             self._add_result_actions(row, output_path)
         if job:
-            self._log(f"הושלם: {Path(job['source_path']).name} → {output_path}")
+            self._log(f"הושלם: {Path(job['source_path']).name} → {Path(output_path).name}")
             storage.add_history_item(storage.HistoryItem.new(
                 source_path=job["source_path"], output_path=output_path,
                 duration_sec=0.0, status="done", chars=char_count,
@@ -564,7 +564,24 @@ class MainWindow(QMainWindow):
         self.tabs.addTab(self.queue_tab, "תור עבודה")
         self.tabs.addTab(self.history_tab, "היסטוריה")
         self.tabs.addTab(self.settings_tab, "הגדרות")
-        self.setCentralWidget(self.tabs)
+
+        central = QWidget()
+        layout = QVBoxLayout(central)
+        layout.setContentsMargins(0, 0, 0, 0)
+        layout.setSpacing(0)
+        layout.addWidget(self.tabs, 1)
+        layout.addWidget(self._build_brand_banner())
+        self.setCentralWidget(central)
+
+    def _build_brand_banner(self) -> QWidget:
+        banner = QLabel(
+            'נבנה על ידי <a href="https://smartrise.co.il">SmartRise</a> 🚀'
+        )
+        banner.setObjectName("brandBanner")
+        banner.setOpenExternalLinks(True)
+        banner.setAlignment(Qt.AlignCenter)
+        banner.setContentsMargins(8, 6, 8, 6)
+        return banner
 
     def closeEvent(self, event):
         if self.queue_tab.thread and self.queue_tab.thread.isRunning():
