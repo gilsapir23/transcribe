@@ -65,6 +65,8 @@ def probe_duration_seconds(input_path: str) -> float:
         stdout=subprocess.PIPE,
         stderr=subprocess.STDOUT,
         text=True,
+        encoding="utf-8",
+        errors="replace",
         creationflags=subprocess.CREATE_NO_WINDOW if hasattr(subprocess, "CREATE_NO_WINDOW") else 0,
     )
     out = proc.stdout or ""
@@ -95,7 +97,8 @@ def split_audio(input_path: str, chunk_seconds: int, out_dir: Path) -> list[Path
         "-c", "copy", "-map", "0:a",
         pattern,
     ]
-    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+    proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                           text=True, encoding="utf-8", errors="replace")
     if proc.returncode != 0:
         # Some containers/codecs don't support stream copy into segments; retry with re-encode.
         cmd = [
@@ -105,7 +108,8 @@ def split_audio(input_path: str, chunk_seconds: int, out_dir: Path) -> list[Path
             "-c:a", "aac", "-b:a", "96k", "-map", "0:a",
             pattern,
         ]
-        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True)
+        proc = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                               text=True, encoding="utf-8", errors="replace")
         if proc.returncode != 0:
             raise TranscriptionError(f"ffmpeg נכשל בפיצול הקובץ:\n{proc.stdout}")
     return sorted(out_dir.glob("chunk_*.m4a"))
