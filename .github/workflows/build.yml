@@ -51,3 +51,14 @@ jobs:
         with:
           files: TranscribeApp-*.zip
           fail_on_unmatched_files: true
+          body: |
+            ## הורדה
+            הורידו את קובץ ה-zip למערכת ההפעלה שלכם, חלצו, והריצו את `TranscribeApp.exe` (Windows) או `TranscribeApp.app` (macOS). לא נדרשת התקנה.
+
+            ## ⚠️ אזהרה בהרצה ראשונה (צפוי, לא באג)
+            הקובץ לא חתום דיגיטלית (חתימת קוד עולה כסף), אז במערכת ההפעלה עלולה להופיע אזהרה:
+
+            - **Windows:** לחיצה ימנית על קובץ ה-zip → **Properties** → סמנו **Unblock** → **OK**, ואז חלצו. אם עדיין מופיע מסך "Windows protected your PC" → **More info** → **Run anyway**.
+            - **macOS:** System Settings → Privacy & Security → אשרו את הפתיחה שם אם היא נחסמה.
+
+            צריך מפתח API משלכם מ-[platform.openai.com](https://platform.openai.com/api-keys) — מוזן פעם אחת במסך ההגדרות בתוכנה.

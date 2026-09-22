@@ -34,6 +34,12 @@ def main():
         "--windowed",
         "--noconfirm",
         "--clean",
+        # UPX-compressed executables are one of the biggest triggers for
+        # antivirus/SmartScreen heuristic false positives on PyInstaller
+        # apps (malware frequently uses UPX to evade signature scanning,
+        # so AV engines are primed to be suspicious of it). We don't need
+        # the smaller file size badly enough to eat that risk.
+        "--noupx",
         "--add-data", f"{ROOT / 'resources'}{SEP}resources",
         "--add-binary", f"{ffmpeg_bin}{SEP}ffmpeg_bin",
         str(ROOT / "main.py"),
@@ -45,6 +51,15 @@ def main():
         args[-1:-1] = ["--icon", str(icon_ico)]
     elif sys.platform == "darwin" and icon_icns.exists():
         args[-1:-1] = ["--icon", str(icon_icns)]
+
+    # A proper Windows version-info resource (company/product name, file
+    # description, version numbers) makes the exe look like a real,
+    # identifiable piece of software rather than an anonymous binary —
+    # some AV heuristics weigh that, and it's what shows up in the file's
+    # own "Details" tab in Windows Explorer.
+    version_file = ROOT / "resources" / "version_info.txt"
+    if sys.platform == "win32" and version_file.exists():
+        args[-1:-1] = ["--version-file", str(version_file)]
 
     print("Running:", " ".join(args))
     subprocess.run(args, check=True, cwd=ROOT)
